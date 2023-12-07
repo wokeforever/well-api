@@ -3,15 +3,17 @@ package com.yupi.project.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.wellapiclientsdk.Client.WellApiClient;
+import com.google.gson.Gson;
+import com.well.wellapicommon.model.entity.InterfaceInfo;
+import com.well.wellapicommon.model.entity.User;
 import com.yupi.project.annotation.AuthCheck;
 import com.yupi.project.common.*;
 import com.yupi.project.constant.CommonConstant;
 import com.yupi.project.exception.BusinessException;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoAddRequest;
+import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoInvokeRequest;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
 import com.yupi.project.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
-import com.yupi.project.model.entity.InterfaceInfo;
-import com.yupi.project.model.entity.User;
 import com.yupi.project.model.enums.InterfaceInfoStatusEnum;
 import com.yupi.project.service.InterfaceInfoService;
 import com.yupi.project.service.UserService;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -106,7 +110,7 @@ public class InterfaceInfoController {
      * @return
      */
     @PostMapping("/update")
-    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody InterfaceInfoUpdateRequest interfaceInfoUpdateRequest,
+    public BaseResponse<Boolean> updateInterfaceInfo(@RequestBody InterfaceInfoUpdateRequest interfaceInfoUpdateRequest,
                                                      HttpServletRequest request) {
         if (interfaceInfoUpdateRequest == null || interfaceInfoUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -141,7 +145,7 @@ public class InterfaceInfoController {
     @AuthCheck(mustRole = "admin")
     @PostMapping("online")
     public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest,
-                                                      HttpServletRequest request) {
+                                                      HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (idRequest == null || idRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -152,10 +156,16 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 判断该接口是否可以调用
-        com.example.wellapiclientsdk.model.User user = new com.example.wellapiclientsdk.model.User();
-        user.setUsername("woke");
-        String username = wellApiClient.getUsernameByPost(user);
-        if (StringUtils.isBlank(username)){
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        WellApiClient tempApiClient = new WellApiClient(accessKey, secretKey);
+
+        Class<?> clazz = WellApiClient.class;
+        Method method = clazz.getDeclaredMethod(oldInterfaceInfo.getName(), String.class);
+        String requestParams ="test";
+        String result1 = (String) method.invoke(tempApiClient, requestParams); //传递给方法的参数
+        if (StringUtils.isBlank(result1)){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"接口验证失败");
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
@@ -189,6 +199,44 @@ public class InterfaceInfoController {
         interfaceInfo.setId(id);
         interfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
         boolean result = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 测试接口
+     *
+     * @param interfaceInfoInvokeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("invoke")
+    public BaseResponse<String> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
+                                                    HttpServletRequest request) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long id = interfaceInfoInvokeRequest.getId();
+        String requestParams = interfaceInfoInvokeRequest.getUserRequestParams();
+        // 判断接口是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if (oldInterfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口已关闭");
+        }
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        WellApiClient tempApiClient = new WellApiClient(accessKey, secretKey);
+
+        Class<?> clazz = WellApiClient.class;
+        Method method = clazz.getDeclaredMethod(oldInterfaceInfo.getName(), String.class);
+        String result = (String) method.invoke(tempApiClient, requestParams); //传递给方法的参数
+//
+//        Gson gson = new Gson();
+//        com.example.wellapiclientsdk.model.User user = gson.fromJson(requestParams, com.example.wellapiclientsdk.model.User.class);
+//        String usernameByPost = tempApiClient.getUsernameByPost(user);
         return ResultUtils.success(result);
     }
     /**

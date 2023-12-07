@@ -17,9 +17,21 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListInterfaceInfoVO = {
+    code?: number;
+    data?: InterfaceInfoVO[];
+    message?: string;
+  };
+
   type BaseResponseListPost = {
     code?: number;
     data?: Post[];
+    message?: string;
+  };
+
+  type BaseResponseListUserInterfaceInfo = {
+    code?: number;
+    data?: UserInterfaceInfo[];
     message?: string;
   };
 
@@ -47,6 +59,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePageUserInterfaceInfo = {
+    code?: number;
+    data?: PageUserInterfaceInfo;
+    message?: string;
+  };
+
   type BaseResponsePageUserVO = {
     code?: number;
     data?: PageUserVO;
@@ -59,9 +77,21 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsestring = {
+    code?: number;
+    data?: string;
+    message?: string;
+  };
+
   type BaseResponseUser = {
     code?: number;
     data?: User;
+    message?: string;
+  };
+
+  type BaseResponseUserInterfaceInfo = {
+    code?: number;
+    data?: UserInterfaceInfo;
     message?: string;
   };
 
@@ -90,6 +120,20 @@ declare namespace API {
     id?: number;
   };
 
+  type getUserInterfaceInfoByIdUsingGET1Params = {
+    /** id */
+    id?: string;
+  };
+
+  type getUserInterfaceInfoByIdUsingGETParams = {
+    /** interfaceInfoId */
+    interfaceInfoId?: Number;
+  };
+
+  type IdRequest = {
+    id?: string;
+  };
+
   type InterfaceInfo = {
     createTime?: string;
     description?: string;
@@ -98,6 +142,7 @@ declare namespace API {
     method?: string;
     name?: string;
     requestHeader?: string;
+    requestParams?: string;
     responseHeader?: string;
     status?: number;
     updateTime?: string;
@@ -114,15 +159,38 @@ declare namespace API {
     url?: string;
   };
 
+  type InterfaceInfoInvokeRequest = {
+    id?: string;
+    userRequestParams?: string;
+  };
+
   type InterfaceInfoUpdateRequest = {
     description?: string;
     id?: string;
     method?: string;
     name?: string;
     requestHeader?: string;
+    requestParams?: string;
     responseHeader?: string;
     status?: number;
     url?: string;
+  };
+
+  type InterfaceInfoVO = {
+    createTime?: string;
+    description?: string;
+    id?: string;
+    isDeleted?: number;
+    method?: string;
+    name?: string;
+    requestHeader?: string;
+    requestParams?: string;
+    responseHeader?: string;
+    status?: number;
+    totalNum?: number;
+    updateTime?: string;
+    url?: string;
+    userId?: string;
   };
 
   type listInterfaceInfoByPageUsingGETParams = {
@@ -204,6 +272,32 @@ declare namespace API {
     userAvatar?: string;
     userName?: string;
     userRole?: string;
+  };
+
+  type listUserInterfaceInfoByPageUsingGETParams = {
+    current?: string;
+    id?: string;
+    interfaceInfoId?: string;
+    leftNum?: number;
+    pageSize?: string;
+    sortField?: string;
+    sortOrder?: string;
+    status?: number;
+    totalNum?: number;
+    userId?: string;
+  };
+
+  type listUserInterfaceInfoUsingGETParams = {
+    current?: string;
+    id?: string;
+    interfaceInfoId?: string;
+    leftNum?: number;
+    pageSize?: string;
+    sortField?: string;
+    sortOrder?: string;
+    status?: number;
+    totalNum?: number;
+    userId?: string;
   };
 
   type listUserUsingGETParams = {
@@ -330,6 +424,19 @@ declare namespace API {
     total?: string;
   };
 
+  type PageUserInterfaceInfo = {
+    countId?: string;
+    current?: string;
+    maxLimit?: string;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: string;
+    records?: UserInterfaceInfo[];
+    searchCount?: boolean;
+    size?: string;
+    total?: string;
+  };
+
   type PageUserVO = {
     countId?: string;
     current?: string;
@@ -392,10 +499,12 @@ declare namespace API {
   };
 
   type User = {
+    accessKey?: string;
     createTime?: string;
     gender?: number;
     id?: string;
     isDelete?: number;
+    secretKey?: string;
     updateTime?: string;
     userAccount?: string;
     userAvatar?: string;
@@ -411,6 +520,34 @@ declare namespace API {
     userName?: string;
     userPassword?: string;
     userRole?: string;
+  };
+
+  type UserInterfaceInfo = {
+    createTime?: string;
+    id?: string;
+    interfaceInfoId?: string;
+    isDeleted?: number;
+    leftNum?: number;
+    status?: number;
+    totalNum?: number;
+    updateTime?: string;
+    userId?: string;
+  };
+
+  type UserInterfaceInfoAddRequest = {
+    interfaceInfoId?: string;
+    leftNum?: number;
+    totalNum?: number;
+    userId?: string;
+  };
+
+  type UserInterfaceInfoUpdateRequest = {
+    id?: string;
+    interfaceInfoId?: string;
+    leftNum?: number;
+    status?: number;
+    totalNum?: number;
+    userId?: string;
   };
 
   type UserLoginRequest = {

@@ -35,3 +35,16 @@ insert into wellapi.`interface_info` (`name`, `description`, `url`, `requestHead
 insert into wellapi.`interface_info` (`name`, `description`, `url`, `requestHeader`, `responseHeader`, `status`, `method`, `userId`) values ('武正豪', '陶修杰', '44.160.188.194', '江苑博', '江晓博', 0, '吕天宇', 342);
 insert into wellapi.`interface_info` (`name`, `description`, `url`, `requestHeader`, `responseHeader`, `status`, `method`, `userId`) values ('龙志泽', '戴展鹏', '106.148.7.110', '阎鸿煊', '郭梓晨', 0, '郝昊焱', 6);
 insert into wellapi.`interface_info` (`name`, `description`, `url`, `requestHeader`, `responseHeader`, `status`, `method`, `userId`) values ('高驰', '孟明哲', '130.234.49.92', '潘嘉熙', '马思', 0, '金子默', 0);
+
+create table if not exists wellapi.`user_interface_info`
+(
+    `id` bigint not null auto_increment comment '主键' primary key,
+    `userId` bigint not null comment '调用用户Id',
+    `interfaceInfoId` bigint not null comment '接口Id',
+    `totalNum` int default 0 not null comment '总调用次数',
+    `leftNum` int default 0 not null comment '剩余次数',
+    `status` int default 0 not null comment '状态（0-关闭，1-开启）',
+    `createTime` datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    `updateTime` datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    `isDeleted` tinyint default 0 not null comment '是否删除(0-未删, 1-已删)'
+) comment '接口信息';

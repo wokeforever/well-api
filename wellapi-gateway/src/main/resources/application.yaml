@@ -1,0 +1,43 @@
+server:
+  port: 8090
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: mock_interface
+          uri: http://localhost:8123
+          predicates:
+            - Path=/api/**
+#          filters:
+#            - AddRequestParameter=name, woke
+#            - AddRequestHeader=name, dasdsadas
+#            - name: CricuitBreaker
+#              args:
+#                name: circuitBreaker
+#                fallbackUri: forward:/fallback
+#            - id:well-fallback
+#              uri: https://yupi.icu
+#              predicates:
+#                - Path=/fallback
+
+  application:
+    name: wellapi-gateway
+
+
+dubbo:
+  application:
+    qosEnable: true
+    qosPort: 33333
+    qosAcceptForeignIp: false
+    name: dubbo-springboot-demo-consumer
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    id: nacos-registry
+    address: nacos://localhost:8848
+
+logging:
+  level:
+    org.springframework.cloud.gateway: trace

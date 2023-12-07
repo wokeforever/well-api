@@ -1,23 +1,21 @@
 package com.yupi.project.model.vo;
 
+import com.well.wellapicommon.model.entity.InterfaceInfo;
 import com.yupi.project.model.entity.Post;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 帖子视图
+ * 接口调用视图
  *
- * @author yupi
- * @TableName product
+ * @author woke
+ * @TableName user_interface_info
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class PostVO extends Post {
+public class InterfaceInfoVO extends InterfaceInfo {
 
-    /**
-     * 是否已点赞
-     */
-    private Boolean hasThumb;
+    private Integer totalNum;
 
     private static final long serialVersionUID = 1L;
 }

@@ -1,7 +1,7 @@
 package com.yupi.project.service;
 
-import com.yupi.project.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.well.wellapicommon.model.entity.InterfaceInfo;
 
 /**
 * @author 蜗壳
