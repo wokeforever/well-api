@@ -1,5 +1,6 @@
 package com.yupi.project.provider;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.well.wellapicommon.model.entity.UserInterfaceInfo;
 import com.well.wellapicommon.service.InnerUserInterfaceInfoService;
@@ -30,5 +31,17 @@ public class InnerUserInterfaceInfoServiceImpl implements InnerUserInterfaceInfo
                 .eq("interfaceInfoId",interfaceId);
         updateWrapper.setSql("leftNum = leftNum - 1,totalNum = totalNum + 1");
         return userInterfaceInfoService.update(updateWrapper);
+    }
+
+    @Override
+    public UserInterfaceInfo invokeUserLeftNum(Long userId, Long interfaceId) {
+        if (userId <= 0 || interfaceId <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        QueryWrapper<UserInterfaceInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId",userId)
+                .eq("interfaceInfoId",interfaceId);
+        return userInterfaceInfoService.getOne(queryWrapper);
+
     }
 }

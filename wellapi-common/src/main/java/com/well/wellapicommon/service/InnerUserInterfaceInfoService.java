@@ -18,4 +18,12 @@ public interface InnerUserInterfaceInfoService  {
      * @return
      */
     boolean invokeCount(Long userId,Long interfaceId);
+
+    /**
+     * 用户剩余调用次数
+     * @param userId
+     * @param interfaceId
+     * @return
+     */
+    UserInterfaceInfo invokeUserLeftNum(Long userId,Long interfaceId);
 }

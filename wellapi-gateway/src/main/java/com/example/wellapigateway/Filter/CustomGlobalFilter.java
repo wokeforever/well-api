@@ -3,6 +3,7 @@ package com.example.wellapigateway.Filter;
 import com.example.wellapiclientsdk.Utils.SignUtil;
 import com.well.wellapicommon.model.entity.InterfaceInfo;
 import com.well.wellapicommon.model.entity.User;
+import com.well.wellapicommon.model.entity.UserInterfaceInfo;
 import com.well.wellapicommon.service.InnerInterfaceInfoService;
 import com.well.wellapicommon.service.InnerUserInterfaceInfoService;
 import com.well.wellapicommon.service.InnerUserService;
@@ -87,7 +88,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         String timestamp = headers.getFirst("timestamp");
         String sign = headers.getFirst("sign");
         String body = headers.getFirst("body");
-        // 实际情况要去数据库查是否分配给该用户
+        // 请求用户是否合法
         User invokeUser = null;
         try {
             invokeUser = innerUserService.getInvokeUser(accessKey);
@@ -102,33 +103,42 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         if (Long.parseLong(nonce)>10000){
             return handleNoAuth(response);
         }
-        //todo 时间和当前时间不超过5分钟
+        // 时间和当前时间不超过5分钟
         Long currentTime = System.currentTimeMillis() / 1000;
         final Long FIVE_MINUTES = 60*5L;
         if(currentTime - Long.parseLong(timestamp) >=  FIVE_MINUTES){
             return handleNoAuth(response);
         }
 
-        //todo 实际是从数据库中取secretKey
+        // 实际是从数据库中取secretKey
         String secretKey = invokeUser.getSecretKey();
-        String genSign = SignUtil.genSign(accessKey, secretKey);
+        String genSign = SignUtil.genSign(body, secretKey);
         if (!genSign.equals(sign)){
             throw new RuntimeException("无权限");
         }
-//        todo 请求的模拟接口是否存在
+//        请求的模拟接口是否存在
         InterfaceInfo interfaceInfo = null;
         try {
+            // todo 待优化 接口地址
             interfaceInfo = interfaceInfoService.getInterfaceInfo(path, methodValue);
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (interfaceInfo == null){
-            throw  new RuntimeException("接口不存在");
+            throw new RuntimeException("接口不存在");
         }
-        //从数据库中查询接口是否存在，以及请求方法是否匹配
+        // 用户剩余的接口调用次数是否大于0
+
 //        请求转发，调用模拟接口
 //        Mono<Void> filter = chain.filter(exchange);
-//        响应日志
+        try {
+            UserInterfaceInfo userInterfaceInfo = innerUserInterfaceInfoService.invokeUserLeftNum(invokeUser.getId(), interfaceInfo.getId());
+            if (userInterfaceInfo == null || userInterfaceInfo.getLeftNum() <= 0 ){
+                return handleNoAuth(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return handleResponse(exchange,chain,interfaceInfo.getId(),invokeUser.getId());
     }
 
@@ -148,6 +158,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
             HttpStatus statusCode = originalResponse.getStatusCode();
 
+            //        响应日志
             if(statusCode == HttpStatus.OK){
                 ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(originalResponse) {
 
@@ -158,7 +169,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                             Flux<? extends DataBuffer> fluxBody = Flux.from(body);
                             //
                             return super.writeWith(fluxBody.map(dataBuffer -> {
-                                //  todo 调用次数+1 invokeCount()
+                                //   调用次数+1 invokeCount()
                                 try {
                                     innerUserInterfaceInfoService.invokeCount(userId, interfaceId);
                                 } catch (Exception e) {

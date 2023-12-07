@@ -62,7 +62,11 @@ const Index: React.FC = () => {
         ...values,
       });
       setInvokeRes(res.data);
+      if(res.code === 0){
+        message.info('请求已发送');
+      }else{
       message.success('请求成功');
+      }
     } catch (error: any) {
       message.error('操作失败，' + error.message);
     }   

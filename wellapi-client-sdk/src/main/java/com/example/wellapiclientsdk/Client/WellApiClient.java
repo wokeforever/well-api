@@ -35,13 +35,13 @@ public class WellApiClient {
 
     private Map<String,String> getHeaderMap(String body){
         HashMap<String,String> hashMap = new HashMap<>();
-
+        body = new String(body.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
         hashMap.put("accessKey",accessKey);
 //        hashMap.put("secretKey",secretKey);
         hashMap.put("nonce", RandomUtil.randomNumbers(4));
         hashMap.put("body",body);
         hashMap.put("timestamp", String.valueOf(System.currentTimeMillis()/1000));
-        hashMap.put("sign", SignUtil.genSign(accessKey,secretKey));
+        hashMap.put("sign", SignUtil.genSign(body,secretKey));
         return hashMap;
     }
 
