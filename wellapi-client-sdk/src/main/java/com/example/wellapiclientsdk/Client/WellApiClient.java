@@ -53,10 +53,7 @@ public class WellApiClient {
                 .form(paramMap)
                 .addHeaders(getHeaderMap(name))
                 .execute();
-        System.out.println(response.getStatus());
-        String result = response.body();
-        System.out.println(result);
-        return result;
+        return response.body();
     }
 
 
@@ -67,11 +64,7 @@ public class WellApiClient {
                 .form(formMap)
                 .addHeaders(getHeaderMap(name))
                 .execute();
-        System.out.println(response.getStatus());
-        String result = response.body();
-        System.out.println(result);
-
-        return result;
+        return response.body();
     }
 
 
@@ -84,10 +77,22 @@ public class WellApiClient {
                 .addHeaders(getHeaderMap(Json))
                 .body(Json)
                 .execute();
-        System.out.println(response.getStatus());
-        String result = response.body();
-        System.out.println(result);
-        return result;
+        return response.body();
 
     }
+
+    public String getRandomName(String requestParams){
+        HttpResponse response = HttpRequest.get(LOCAL_PATH+"/api/interface/name")
+                .addHeaders(getHeaderMap(""))
+                .execute();
+        return response.body();
+    }
+
+    public String getRandomSentences(String requestParams){
+        HttpResponse response = HttpRequest.get(LOCAL_PATH+"/api/interface/sentences")
+                .addHeaders(getHeaderMap(""))
+                .execute();
+        return response.body();
+    }
+
 }

@@ -3,7 +3,6 @@ package com.yupi.project.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.wellapiclientsdk.Client.WellApiClient;
-import com.google.gson.Gson;
 import com.well.wellapicommon.model.entity.InterfaceInfo;
 import com.well.wellapicommon.model.entity.User;
 import com.yupi.project.annotation.AuthCheck;
@@ -210,8 +209,8 @@ public class InterfaceInfoController {
      * @return
      */
     @PostMapping("invoke")
-    public BaseResponse<String> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
-                                                    HttpServletRequest request) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public BaseResponse invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
+                                            HttpServletRequest request) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -233,6 +232,9 @@ public class InterfaceInfoController {
         Class<?> clazz = WellApiClient.class;
         Method method = clazz.getDeclaredMethod(oldInterfaceInfo.getName(), String.class);
         String result = (String) method.invoke(tempApiClient, requestParams); //传递给方法的参数
+        if (result.equals("Error request, response status: 403")){
+            return ResultUtils.error(ErrorCode.NO_AUTH_ERROR,"无调用次数");
+        }
 //
 //        Gson gson = new Gson();
 //        com.example.wellapiclientsdk.model.User user = gson.fromJson(requestParams, com.example.wellapiclientsdk.model.User.class);

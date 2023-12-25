@@ -12,7 +12,6 @@ import com.yupi.project.exception.BusinessException;
 import com.yupi.project.mapper.UserInterfaceInfoMapper;
 import com.yupi.project.model.vo.InterfaceInfoVO;
 import com.yupi.project.service.InterfaceInfoService;
-import com.yupi.project.service.UserInterfaceInfoService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
